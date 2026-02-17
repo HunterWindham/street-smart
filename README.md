@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StreetSmart
 
-## Getting Started
+**Live app:** [https://street-smart-vercel.vercel.app/](https://street-smart-vercel.vercel.app/)
 
-First, run the development server:
+Address Insights Webpage Interview Challenge.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## What I Built vs. AI Assistance
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+I used AI mainly as a starting point to move faster: initial scaffolding, feature implementation ideas, and styling. I drove the architecture, scoring logic, and integration with Mapbox; AI helped with boilerplate, README.md, and UI details.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Approach & Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Mapbox (Search Box + GL).
+- **Flow:** Home page has an address search box. Selecting a result navigates to `/insights?lng=&lat=&...` where the insights page shows a map and location scores.
+- **Key pieces:**
+  - `app/page.tsx` — Home with search.
+  - `app/insights/page.tsx` — Reads `lng`/`lat` from the URL, renders map and scores.
+  - `components/AddressSearchBox.tsx` — Mapbox Search Box; on select, pushes query params and routes to `/insights`.
+  - `components/Map.tsx` — Mapbox GL map (center/zoom from URL).
+  - `components/LocationScores.tsx` — Fetches and displays walking score, driving score, and urban/suburban.
+  - `lib/scores.ts` — Scoring logic (see below).
+  - `lib/mapbox.ts` — Mapbox token from `NEXT_PUBLIC_MAPBOX_TOKEN`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**How scoring works:** Scores are based on Point of Intrest(POI) density from the Mapbox Search Box category API. For a given location we query six categories (restaurant, cafe, grocery, school, park, pharmacy) in two Bounding Boxes: **0.5 mi** (walking) and **5 mi** (driving). Each category returns up to 10 results; the max total is 60 per radius. The **walking score** and **driving score** are each `(count / 60) * 100`, capped at 100. **Urban vs. Suburban** is derived from the walking count: if it’s ≥ 75% of the walking cap, we label the area **Urban**, otherwise **Suburban**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Assumptions & Design Decisions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Scope vs. time:** Kept scope tight to best match suggested time limits. Omitted: search history, highlighting nearby amenities on the map, and automated tests.
+- **No custom API layer:** All external calls go to Mapbox (search + category APIs). There’s no separate backend or API route; the app talks to Mapbox from the client/Next server as needed, so an extra API layer didn’t add enough value for this project.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Running Locally
+
+1. Clone the repo and install dependencies: `npm install`
+2. Add a `.env` (or `.env.local`) with `NEXT_PUBLIC_MAPBOX_TOKEN=<your-mapbox-token>`
+3. Run `npm run dev` and open the URL shown in the terminal
