@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --grid-line: rgba(0 0 0 / 0.06);
 }
 
 @theme inline {
@@ -16,11 +17,19 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --grid-line: rgba(255 255 255 / 0.08);
   }
 }
 
+/* App-wide background: soft glow (repeats every viewport height) + subtle grid. */
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 47px, var(--grid-line) 47px, var(--grid-line) 48px),
+    repeating-linear-gradient(90deg, transparent, transparent 47px, var(--grid-line) 47px, var(--grid-line) 48px),
+    radial-gradient(ellipse 80% 100% at 50% 0%, rgba(39 39 42 / 0.5), transparent 55%);
+  background-size: auto, auto, 100% 100vh;
+  background-repeat: repeat, repeat, repeat-y;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
