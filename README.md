@@ -1,7 +1,5 @@
 # StreetSmart
 
-**Live app:** [https://street-smart-vercel.vercel.app/](https://street-smart-vercel.vercel.app/)
-
 Address Insights Webpage Interview Challenge.
 
 ---
